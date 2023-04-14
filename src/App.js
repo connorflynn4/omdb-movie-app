@@ -11,10 +11,13 @@ export default function App() {
   const [data, setData] = useState({});
   const [searchValue, setSearchValue] = useState("");
 
+  const apiKey = process.env.REACT_APP_API_KEY;
+
+
   // uses a react hook to fetch data asynchrononusly
   useEffect(
     function () {
-      fetch(`https://www.omdbapi.com/?s=${searchValue}&apikey=${process.env.REACT_APP_API_KEY}`)
+      fetch(`https://www.omdbapi.com/?s=${searchValue}&apikey=${apiKey}`)
         .then((response) => response.json())
         .then((result) => setData(result))
         .catch((error) => console.log("error", error));

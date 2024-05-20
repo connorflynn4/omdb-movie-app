@@ -1,29 +1,24 @@
 import { useEffect, useState } from "react";
-// using reactstrap to save time with design
-import { Container,Card,CardImg,CardText,CardBody,CardTitle,Row,Col,Button } from "reactstrap";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Container, Card, CardImg, CardText, CardBody, CardTitle, Row, Col, Button } from "reactstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Search from "./components/Search";
-
+import MovieDetail from "./components/MovieDetail";
 
 export default function App() {
-  // console.log(process.env.REACT_APP_API_KEY) #testing
-
   const [data, setData] = useState({});
   const [searchValue, setSearchValue] = useState("");
 
   const apiKey = process.env.REACT_APP_API_KEY;
 
-
-  // uses a react hook to fetch data asynchrononusly
-  useEffect(
-    function () {
+  useEffect(() => {
+    if (searchValue) {
       fetch(`https://www.omdbapi.com/?s=${searchValue}&apikey=${apiKey}`)
         .then((response) => response.json())
         .then((result) => setData(result))
         .catch((error) => console.log("error", error));
-    },
-    [searchValue]
-  );
+    }
+  }, [searchValue]);
 
   function onKeyPressSearchValue(event) {
     if (event.charCode === 13) {
@@ -35,50 +30,49 @@ export default function App() {
     setSearchValue(searchValue);
   }
 
-// accessing target input and using it as search value
   function onChangeSearchValue(e) {
     setSearchValue(e.target.value);
   }
 
- 
   return (
-    <Container style={{ marginTop: "50px" }}>
-      <Search
-        onChangeSearchValue={onChangeSearchValue}
-        onKeyPressSearchValue={onKeyPressSearchValue}
-        onClickSearch={onClickSearch}
-      />
-      <br />
-      
-        <section className="movies-section">
-          <Row>
-            {data.Search &&
-              data.Search.map((movie) => {
-                return (
-                  <Col md={2} key={movie.imdbID}>
-                    <Card>
-                      <CardImg
-                        top
-                        width="100%"
-                        src={movie.Poster}
-                        alt="image"
-                      />
-                      <CardBody>
-                        <CardTitle>{movie.Title}</CardTitle>
-                        <CardText>{movie.Year}</CardText>
-                        <Button>
-                          View Movie
-                        </Button>
-                      </CardBody>
-                    </Card>
-                  </Col>
-                );
-              })}
-          </Row>
-        </section>
-      
-       
-      
-    </Container>
+    <Router>
+      <Container style={{ marginTop: "50px" }}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <Search
+                  onChangeSearchValue={onChangeSearchValue}
+                  onKeyPressSearchValue={onKeyPressSearchValue}
+                  onClickSearch={onClickSearch}
+                />
+                <br />
+                <section className="movies-section">
+                  <Row>
+                    {data.Search &&
+                      data.Search.map((movie) => (
+                        <Col md={2} key={movie.imdbID}>
+                          <Card>
+                            <CardImg top width="100%" src={movie.Poster} alt="image" />
+                            <CardBody>
+                              <CardTitle>{movie.Title}</CardTitle>
+                              <CardText>{movie.Year}</CardText>
+                              <Button tag={Link} to={`/movie/${movie.imdbID}`}>
+                                View Movie
+                              </Button>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                      ))}
+                  </Row>
+                </section>
+              </>
+            }
+          />
+          <Route path="/movie/:id" element={<MovieDetail />} />
+        </Routes>
+      </Container>
+    </Router>
   );
 }

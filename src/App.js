@@ -18,7 +18,7 @@ export default function App() {
         .then((result) => setData(result))
         .catch((error) => console.log("error", error));
     }
-  }, [searchValue]);
+  }, [searchValue, apiKey]);
 
   function onKeyPressSearchValue(event) {
     if (event.charCode === 13) {
